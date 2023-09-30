@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LoveLink: Conversation Coach</title>
     <style>
+        :root {
+            --neon-green: #00ff00;
+            --neon-pink: #ff00ff;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #000;
             margin: 0;
             padding: 0;
-            color: #00ff00; /* Neon green text color */
+            color: var(--neon-green);
         }
 
         h1 {
-            color: #ff00ff; /* Neon pink heading color */
+            color: var(--neon-pink);
         }
 
         p {
-            color: #00ff00; /* Neon green text color */
+            color: var(--neon-green);
         }
 
         div {
@@ -27,21 +33,21 @@
             padding: 20px;
             background-color: #000;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border: 1px solid #00ff00; /* Neon green border */
+            border: 1px solid var(--neon-green);
         }
 
         input[type="text"], select, button {
             width: 100%;
             margin-top: 10px;
             padding: 10px;
-            border: 1px solid #00ff00; /* Neon green border */
+            border: 1px solid var(--neon-green);
             border-radius: 5px;
             background-color: #000;
-            color: #00ff00; /* Neon green text color */
+            color: var(--neon-green);
         }
 
         button {
-            background-color: #ff00ff; /* Neon pink button color */
+            background-color: var(--neon-pink);
             color: #000;
             font-weight: bold;
             cursor: pointer;
@@ -60,7 +66,7 @@
             margin-bottom: 10px;
             padding: 10px;
             border-radius: 5px;
-            background-color: #00ff00; /* Neon green message background */
+            background-color: var(--neon-green);
             color: #000;
         }
 
@@ -69,6 +75,7 @@
         }
     </style>
 </head>
+
 <body>
     <div>
         <h1>Welcome to LoveLink: Conversation Coach</h1>
@@ -77,6 +84,7 @@
         <select id="genderPreference">
             <option value="male">Male</option>
             <option value="female">Female</option>
+            <option value="other">Prefer Not to Say</option>
         </select>
         <button onclick="startChat()">Start Chat</button>
     </div>
@@ -95,22 +103,21 @@
             "Ava": "You are on a date with Ava, a 27-year-old veterinarian. She loves animals, enjoys hiking, and is a fan of classic rock music."
         };
 
-        let currentPersona = null; // To store the current blind date persona
+        let currentPersona = null;
+
+        function decodeKey(encodedKey) {
+            return atob(encodedKey);
+        }
 
         async function startChat() {
-            const apiKey = document.getElementById("apiKey").value;
+            const apiKey = decodeKey(document.getElementById("apiKey").value);
             const gender = document.getElementById("genderPreference").value;
-            
-            // Select a random persona
+
             const personas = Object.keys(blind_date_personas);
             currentPersona = personas[Math.floor(Math.random() * personas.length)];
-            
-            const initialPrompt = blind_date_personas[currentPersona];
-            
-            // Display the chatbox
+
             document.getElementById("chatbox").style.display = "block";
-            
-            // Set the initial system message
+
             const data = {
                 model: "gpt-3.5-turbo",
                 messages: [
@@ -135,8 +142,7 @@
                 const result = await response.json();
                 const botMessage = result.choices[0].message.content;
 
-                const messages = document.getElementById("messages");
-                messages.innerHTML += `<div>${currentPersona}: ${botMessage}</div>`;
+                document.getElementById("messages").innerHTML += `<div>${currentPersona}: ${botMessage}</div>`;
             } catch (error) {
                 console.error("Error starting chat:", error);
             }
@@ -144,7 +150,7 @@
 
         async function sendMessage() {
             const userInput = document.getElementById("userInput").value;
-            const apiKey = document.getElementById("apiKey").value;
+            const apiKey = decodeKey(document.getElementById("apiKey").value);
             const messages = document.getElementById("messages");
             messages.innerHTML += `<div>You: ${userInput}</div>`;
 
@@ -166,7 +172,7 @@
                 });
 
                 if (!response.ok) {
-                    throw an Error(`API request failed with status ${response.status}`);
+                    throw new Error(`API request failed with status ${response.status}`);
                 }
 
                 const result = await response.json();
@@ -178,8 +184,9 @@
                 messages.innerHTML += `<div>Error: ${error.message}</div>`;
             }
 
-            document.getElementById("userInput").value = ""; // Clear the input field
+            document.getElementById("userInput").value = "";
         }
     </script>
 </body>
+
 </html>

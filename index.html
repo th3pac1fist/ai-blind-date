@@ -80,8 +80,7 @@
     <div>
         <h1>Welcome to LoveLink: Conversation Coach</h1>
         <p>Welcome to LoveLink: Conversation Coach, where AI-powered blind dates take romance to the next level! Our unique ChatGPT technology pairs you with compatible strangers for a thrilling dating experience.</p>
-        <!-- Note: The obfuscated API key placeholder is just an example. -->
-        <input type="text" id="apiKey" placeholder="Enter your encoded API Key">
+        <input type="text" id="apiKey" placeholder="Enter your OpenAI API Key">
         <select id="genderPreference">
             <option value="male">Male</option>
             <option value="female">Female</option>
@@ -96,15 +95,11 @@
     </div>
 
     <script>
-        function decodeKey(encodedKey) {
-            return atob(encodedKey);
-        }
-
         async function startChat() {
             console.log("startChat function triggered");
-            alert("startChat function triggered");
+            document.getElementById("chatbox").style.display = "block"; // Make chatbox visible right away
 
-            const apiKey = decodeKey(document.getElementById("apiKey").value);
+            const apiKey = document.getElementById("apiKey").value;
             const gender = document.getElementById("genderPreference").value;
 
             console.log("API Key:", apiKey);

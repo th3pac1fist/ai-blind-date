@@ -95,15 +95,33 @@
     </div>
 
     <script>
+        const blind_date_personas = {
+            "Cat": "You are on a date with Cat, a 23-year-old software engineer from a large tech company. She studied computer science at MIT and loves to say 'em...' at the end of her sentences.",
+            "Sophia": "You are on a date with Sophia, a 28-year-old artist who loves to paint landscapes. She's traveled to over 30 countries and has a cat named Whiskers.",
+            "Emma": "You are on a date with Emma, a 26-year-old yoga instructor. She's vegan, loves nature, and has a passion for mindfulness and meditation.",
+            "Olivia": "You are on a date with Olivia, a 30-year-old journalist. She's a bookworm, enjoys indie music, and has a penchant for vintage fashion.",
+            "Ava": "You are on a date with Ava, a 27-year-old veterinarian. She loves animals, enjoys hiking, and is a fan of classic rock music."
+        };
+
+        let currentPersona = null;
+
         async function startChat() {
             console.log("startChat function triggered");
-            document.getElementById("chatbox").style.display = "block"; // Make chatbox visible right away
 
             const apiKey = document.getElementById("apiKey").value;
             const gender = document.getElementById("genderPreference").value;
 
-            console.log("API Key:", apiKey);
-            console.log("Selected Gender:", gender);
+            const personas = Object.keys(blind_date_personas);
+            currentPersona = personas[Math.floor(Math.random() * personas.length)];
+
+            document.getElementById("chatbox").style.display = "block"; // Make chatbox visible right away
+
+            const data = {
+                model: "gpt-3.5-turbo",
+                messages: [
+                    { role: "system", content: `You are now on a date with ${currentPersona}.` }
+                ]
+            };
 
             try {
                 const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -112,24 +130,20 @@
                         "Authorization": `Bearer ${apiKey}`,
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({
-                        model: "gpt-3.5-turbo",
-                        messages: [
-                            { role: "system", content: "You are now on a test message." }
-                        ]
-                    })
+                    body: JSON.stringify(data)
                 });
 
                 if (!response.ok) {
-                    console.log("API Response Error:", response.statusText);
-                    alert("API Response Error: " + response.statusText);
-                } else {
-                    const result = await response.json();
-                    console.log("API Response:", result);
+                    throw new Error(`API request failed with status ${response.status}`);
                 }
+
+                const result = await response.json();
+                const botMessage = result.choices[0].message.content;
+
+                const messages = document.getElementById("messages");
+                messages.innerHTML += `<div>${currentPersona}: ${botMessage}</div>`;
             } catch (error) {
-                console.error("API Call Error:", error);
-                alert("API Call Error: " + error.message);
+                console.error("Error starting chat:", error);
             }
         }
 
@@ -148,8 +162,6 @@
             };
 
             try {
-                console.log("Sending message to OpenAI API...");
-        
                 const response = await fetch("https://api.openai.com/v1/chat/completions", {
                     method: "POST",
                     headers: {
@@ -160,18 +172,15 @@
                 });
 
                 if (!response.ok) {
-                    console.log("API Response Error:", response.statusText);
-                    alert("API Response Error: " + response.statusText);
-                    return;
+                    throw new Error(`API request failed with status ${response.status}`);
                 }
 
                 const result = await response.json();
-                console.log("API Response:", result);
                 const botMessage = result.choices[0].message.content;
+
                 messages.innerHTML += `<div>${currentPersona}: ${botMessage}</div>`;
             } catch (error) {
-                console.error("API Call Error:", error);
-                alert("API Call Error: " + error.message);
+                console.error("Error sending message:", error);
                 messages.innerHTML += `<div>Error: ${error.message}</div>`;
             }
 

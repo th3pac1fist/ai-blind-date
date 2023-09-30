@@ -80,7 +80,8 @@
     <div>
         <h1>Welcome to LoveLink: Conversation Coach</h1>
         <p>Welcome to LoveLink: Conversation Coach, where AI-powered blind dates take romance to the next level! Our unique ChatGPT technology pairs you with compatible strangers for a thrilling dating experience.</p>
-        <input type="text" id="apiKey" placeholder="Enter your OpenAI API Key">
+        <!-- Note: The obfuscated API key placeholder is just an example. -->
+        <input type="text" id="apiKey" placeholder="Enter your encoded API Key">
         <select id="genderPreference">
             <option value="male">Male</option>
             <option value="female">Female</option>
@@ -95,35 +96,19 @@
     </div>
 
     <script>
-        const blind_date_personas = {
-            "Cat": "You are on a date with Cat, a 23-year-old software engineer from a large tech company. She studied computer science at MIT and loves to say 'em...' at the end of her sentences.",
-            "Sophia": "You are on a date with Sophia, a 28-year-old artist who loves to paint landscapes. She's traveled to over 30 countries and has a cat named Whiskers.",
-            "Emma": "You are on a date with Emma, a 26-year-old yoga instructor. She's vegan, loves nature, and has a passion for mindfulness and meditation.",
-            "Olivia": "You are on a date with Olivia, a 30-year-old journalist. She's a bookworm, enjoys indie music, and has a penchant for vintage fashion.",
-            "Ava": "You are on a date with Ava, a 27-year-old veterinarian. She loves animals, enjoys hiking, and is a fan of classic rock music."
-        };
-
-        let currentPersona = null;
-
         function decodeKey(encodedKey) {
             return atob(encodedKey);
         }
 
         async function startChat() {
+            console.log("startChat function triggered");
+            alert("startChat function triggered");
+
             const apiKey = decodeKey(document.getElementById("apiKey").value);
             const gender = document.getElementById("genderPreference").value;
 
-            const personas = Object.keys(blind_date_personas);
-            currentPersona = personas[Math.floor(Math.random() * personas.length)];
-
-            document.getElementById("chatbox").style.display = "block";
-
-            const data = {
-                model: "gpt-3.5-turbo",
-                messages: [
-                    { role: "system", content: `You are now on a date with ${currentPersona}.` }
-                ]
-            };
+            console.log("API Key:", apiKey);
+            console.log("Selected Gender:", gender);
 
             try {
                 const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -132,19 +117,24 @@
                         "Authorization": `Bearer ${apiKey}`,
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo",
+                        messages: [
+                            { role: "system", content: "You are now on a test message." }
+                        ]
+                    })
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API request failed with status ${response.status}`);
+                    console.log("API Response Error:", response.statusText);
+                    alert("API Response Error: " + response.statusText);
+                } else {
+                    const result = await response.json();
+                    console.log("API Response:", result);
                 }
-
-                const result = await response.json();
-                const botMessage = result.choices[0].message.content;
-
-                document.getElementById("messages").innerHTML += `<div>${currentPersona}: ${botMessage}</div>`;
             } catch (error) {
-                console.error("Error starting chat:", error);
+                console.error("API Call Error:", error);
+                alert("API Call Error: " + error.message);
             }
         }
 

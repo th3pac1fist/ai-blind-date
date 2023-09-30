@@ -4,12 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LoveLink: Conversation Coach</title>
-    <link rel="stylesheet" href="css/main.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            color: #555;
+        }
+
+        div {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"], select, button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #chatbox {
+            margin-top: 20px;
+            display: none;
+        }
+
+        #messages {
+            margin-top: 10px;
+        }
+
+        #messages > div {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: #fff;
+        }
+
+        #userInput {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <div>
         <h1>Welcome to LoveLink: Conversation Coach</h1>
-        <p>Welcome to LoveLink, where AI-powered blind dates take romance to the next level! Our unique ChatGPT technology pairs you with compatible strangers for a thrilling dating experience.</p>
+        <p>Welcome to LoveLink: Conversation Coach, where AI-powered blind dates take romance to the next level! Our unique ChatGPT technology pairs you with compatible strangers for a thrilling dating experience.</p>
         <input type="text" id="apiKey" placeholder="Enter your OpenAI API Key">
         <select id="genderPreference">
             <option value="male">Male</option>
@@ -24,24 +83,23 @@
     </div>
 
     <script>
-        // Base64 encoded version of the blind_date_personas dictionary
-        const encodedPersonas = "eyJ..."; // Replace with the actual Base64 string
-
-        // Function to decode the Base64 string back to the dictionary
-        function decodePersonas(encodedData) {
-            const jsonString = atob(encodedData);
-            return JSON.parse(jsonString);
-        }
-
-        // Decoding the personas
-        const blind_date_personas = decodePersonas(encodedPersonas);
+        const blind_date_personas = {
+            "Cat": "You are on a date with Cat, a 23-year-old software engineer from a large tech company. She studied computer science at MIT and loves to say 'em...' at the end of her sentences.",
+            "Sophia": "You are on a date with Sophia, a 28-year-old artist who loves to paint landscapes. She's traveled to over 30 countries and has a cat named Whiskers.",
+            "Emma": "You are on a date with Emma, a 26-year-old yoga instructor. She's vegan, loves nature, and has a passion for mindfulness and meditation.",
+            "Olivia": "You are on a date with Olivia, a 30-year-old journalist. She's a bookworm, enjoys indie music, and has a penchant for vintage fashion.",
+            "Ava": "You are on a date with Ava, a 27-year-old veterinarian. She loves animals, enjoys hiking, and is a fan of classic rock music."
+        };
 
         async function startChat() {
             const apiKey = document.getElementById("apiKey").value;
+            const gender = document.getElementById("genderPreference").value;
             
             // Select a random persona
-            const randomKey = Object.keys(blind_date_personas)[Math.floor(Math.random() * Object.keys(blind_date_personas).length)];
-            const randomPersona = blind_date_personas[randomKey];
+            const personas = Object.keys(blind_date_personas);
+            const randomPersona = personas[Math.floor(Math.random() * personas.length)];
+            
+            const initialPrompt = blind_date_personas[randomPersona];
             
             // Display the chatbox
             document.getElementById("chatbox").style.display = "block";
@@ -50,7 +108,7 @@
             const data = {
                 model: "gpt-3.5-turbo",
                 messages: [
-                    { role: "system", content: randomPersona }
+                    { role: "system", content: initialPrompt }
                 ]
             };
 
